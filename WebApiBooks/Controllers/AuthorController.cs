@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +29,7 @@ namespace WebApiBooks.Controllers
         }
 
         //get api author 5
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "Obtainauthor")]
         public ActionResult<Author> Get(int id)
         {
             var author = context.Authors.FirstOrDefault(x => x.Id == id);
@@ -47,9 +48,47 @@ namespace WebApiBooks.Controllers
         {
             context.Add(author);
             context.SaveChanges();
-            return new CreatedAtRouteResult ("Obtain author", author);
+            return new CreatedAtRouteResult ("Obtainauthor",new { id = author.Id},author);
             
 
+        }
+
+        //put api/authors/5
+        //modify record
+        [HttpPut("{id}")]
+        public ActionResult Put(int id, [FromBody] Author author)
+        {
+            context.Entry(author).State = EntityState.Modified;
+            context.SaveChanges();
+            return Ok();
+
+
+        }
+
+        //delete api/authors/5
+        //delete record
+        [HttpDelete("{id}")]
+        public ActionResult<Author> Delete( int id)
+        {
+            var author = context.Authors.FirstOrDefault(x => x.Id == id);
+
+            if (author == null)
+            {
+                return NotFound();
+            }
+
+            context.Remove(author);
+            context.SaveChanges();
+            return Ok(author);
+
+
+        }
+        //get api authors
+        //show first
+        [HttpGet("first")]
+        public ActionResult<Author> GetFirst()
+        {
+            return context.Authors.FirstOrDefault();
         }
 
     }
